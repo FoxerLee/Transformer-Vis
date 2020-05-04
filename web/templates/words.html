@@ -35,7 +35,7 @@
           </a>
         </li>
         <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
-          <a class="nav-link" href="/horizon_softmax">
+          <a class="nav-link" href="charts.html">
             <i class="fa fa-fw fa-area-chart"></i>
             <span class="nav-link-text">Charts</span>
           </a>
@@ -110,10 +110,10 @@
       <!-- Area Chart Example-->
       <div class="card mb-3">
         <div class="card-header">
-          <i class="fa fa-bar-chart"></i> {{ matrix_name | safe }} Matrix</div>
+          <i class="fa fa-bar-chart"></i> Softmax Chart</div>
         <div class="card-body">
             <div class="container">
-                <div id="dict"></div>
+                <div id="multi_softmax"></div>
             </div>
         </div>
         <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
@@ -200,31 +200,13 @@
             // Load the Observable runtime and inspector.
             import {Runtime, Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
 
-
-
-            import dict from "https://api.observablehq.com/@foxerlee/barcode-plot.js?v=3";
-            const maind = new Runtime().module(dict, name => {
+            import sm from "https://api.observablehq.com/@foxerlee/multi-line-chart.js?v=3";
+            const maind = new Runtime().module(sm, name => {
               if (name === "chart") {
-                return new Inspector(document.querySelector("#dict"));
+                return new Inspector(document.querySelector("#multi_softmax"));
               }
             });
-            maind.redefine("data", newData['dict']);
-
-            import dict_max from "https://api.observablehq.com/@foxerlee/barcode-plot.js?v=3";
-            const mainmax = new Runtime().module(dict_max, name => {
-               if (name === "chart") {
-                   return new Inspector(document.querySelector("#dict_max"));
-               }
-            });
-            mainmax.redefine("data", newData['dict_max']);
-
-            import dict_mean from "https://api.observablehq.com/@foxerlee/barcode-plot.js?v=3";
-            const mainmean = new Runtime().module(dict_mean, name => {
-               if (name === "chart") {
-                   return new Inspector(document.querySelector("#dict_mean"));
-               }
-            });
-            mainmean.redefine("data", newData['dict_mean']);
+            maind.redefine("data", newData['multi_softmax']);
 
         </script>
   </div>

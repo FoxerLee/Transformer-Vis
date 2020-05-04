@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from web.Utils.WordVecs import *
+
 from keras.preprocessing.sequence import pad_sequences
+from sklearn import decomposition
 
 import json
 import os
@@ -129,119 +131,166 @@ def predict(X, model_path, path, length):
     return result
 
 
-def new_qkv_format(result, words, max_=1):
-    q = result['q']
-    q_data = {}
-    dates = [j for j in range(30)]
-    q_data['dates'] = dates
-    series = []
-    for i in range(q.shape[0]):
-        row = []
-        cand = []
-        for j in range(q.shape[1]):
-            cand.append(q[i][j])
-            if len(cand) == max_:
-                row.append(str(np.max(np.array(cand))))
-                cand = []
-        # print("row {}".format(row))
-        # print("q[i] {}".format(q[i].tolist()))
-        tmp = {}
-        tmp['name'] = words[i]
-        # tmp['values'] = q[i].tolist()
-        tmp['values'] = row
-        series.append(tmp)
-    q_data['series'] = series
+# def new_qkv_format(result, words, max_=1):
+#     q = result['q']
+#     q_data = {}
+#     dates = [j for j in range(30)]
+#     q_data['dates'] = dates
+#     series = []
+#     for i in range(q.shape[0]):
+#         row = []
+#         cand = []
+#         for j in range(q.shape[1]):
+#             cand.append(q[i][j])
+#             if len(cand) == max_:
+#                 row.append(str(np.max(np.array(cand))))
+#                 cand = []
+#         # print("row {}".format(row))
+#         # print("q[i] {}".format(q[i].tolist()))
+#         tmp = {}
+#         tmp['name'] = words[i]
+#         # tmp['values'] = q[i].tolist()
+#         tmp['values'] = row
+#         series.append(tmp)
+#     q_data['series'] = series
+#
+#     return q_data
 
-    return q_data
 
-
-def qkv_format(result, words, max_=1):
-    q = result["q"]
-    q_dict = []
-    for i in range(q.shape[0]):
-        q[i] = min_max_range(q[i], (-0.5, 0.5))
+def qkv_format(result, words, max_=1, mat='q'):
+    matrix = result[mat]
+    dict = []
+    for i in range(matrix.shape[0]):
+        matrix[i] = min_max_range(matrix[i], (-0.5, 0.5))
         cand = []
         tmp = {}
         tmp['row'] = words[i]
         val = 0
-        for j in range(q.shape[1]):
-            cand.append(q[i][j])
+        for j in range(matrix.shape[1]):
+            cand.append(matrix[i][j])
             if len(cand) == max_:
-                tmp['value'] = str(val / q.shape[1])
+                tmp['value'] = str(val / matrix.shape[1])
                 tmp['color'] = str(np.max(np.array(cand)))
-                q_dict.append(tmp)
+                dict.append(tmp)
                 cand = []
                 tmp = {}
                 tmp['row'] = words[i]
                 val += 1
-            # tmp = {}
-            # tmp['row'] = words[i]
-            # tmp['value'] = str(j / q.shape[1])
-            # tmp['color'] = str(-1 + (1 + 1)/(np.max(q[i])-np.min(q[i]))*(q[i][j]-np.min(q[i])))
-            # tmp['color'] = str(q[i][j])
-            # tmp['color'] = str(1.0/(1.0 + np.exp(-q[i][j])))
-            # q_dict.append(tmp)
-
-    k = result["k"]
-    k_dict = []
-    for i in range(k.shape[0]):
-        k[i] = min_max_range(k[i], (-0.5, 0.5))
-        for j in range(k.shape[1]):
-            tmp = {}
-            tmp['row'] = words[i]
-            tmp['value'] = str(j / k.shape[1])
-            tmp['color'] = str(k[i][j])
-            k_dict.append(tmp)
-
-    v = result["v"]
-    v_dict = []
-    for i in range(v.shape[0]):
-        v[i] = min_max_range(v[i], (-0.5, 0.5))
-        for j in range(v.shape[1]):
-            tmp = {}
-            tmp['row'] = words[i]
-            tmp['value'] = str(j / v.shape[1])
-            tmp['color'] = str(v[i][j])
-            v_dict.append(tmp)
-
-    return q_dict, k_dict, v_dict
+    return dict
 
 
-def input_embedding_format(result, words):
-    input_embedding = result["input_embedding"]
-    input_embedding_dict = []
-    for i in range(input_embedding.shape[0]):
-        # input_embedding[i] = min_max_range(input_embedding[i], (-0.5, 0.5))
-        for j in range(input_embedding.shape[1]):
-            tmp = {}
-            tmp['row'] = words[i]
-            tmp['value'] = str(j / input_embedding.shape[1])
-            # tmp['color'] = str(-1 + (1 + 1)/(np.max(q)-np.min(q))*(q[i][j]-np.min(q)))
-            tmp['color'] = str(input_embedding[i][j])
-            # tmp['color'] = str(1.0/(1.0 + np.exp(-q[i][j])))
-            input_embedding_dict.append(tmp)
+def qkv_format_mean(result, words, mean_=1, mat='q'):
+    matrix = result[mat]
+    dict = []
+    for i in range(matrix.shape[0]):
+        matrix[i] = min_max_range(matrix[i], (-0.5, 0.5))
+        cand = []
+        tmp = {}
+        tmp['row'] = words[i]
+        val = 0
+        for j in range(matrix.shape[1]):
+            cand.append(matrix[i][j])
+            if len(cand) == mean_:
+                tmp['value'] = str(val / matrix.shape[1])
+                tmp['color'] = str(np.mean(np.array(cand)))
+                dict.append(tmp)
+                cand = []
+                tmp = {}
+                tmp['row'] = words[i]
+                val += 1
+    return dict
 
-    return input_embedding_dict
+
+# def input_embedding_format(result, words):
+#     input_embedding = result["input_embedding"]
+#     input_embedding_dict = []
+#     for i in range(input_embedding.shape[0]):
+#         # input_embedding[i] = min_max_range(input_embedding[i], (-0.5, 0.5))
+#         for j in range(input_embedding.shape[1]):
+#             tmp = {}
+#             tmp['row'] = words[i]
+#             tmp['value'] = str(j / input_embedding.shape[1])
+#             # tmp['color'] = str(-1 + (1 + 1)/(np.max(q)-np.min(q))*(q[i][j]-np.min(q)))
+#             tmp['color'] = str(input_embedding[i][j])
+#             # tmp['color'] = str(1.0/(1.0 + np.exp(-q[i][j])))
+#             input_embedding_dict.append(tmp)
+#
+#     return input_embedding_dict
 
 
-def wqwkwv_format(result):
-    wq = result["wq"]
-    wq_dict = {}
+# def wqwkwv_format(result):
+#     wq = result["wq"]
+#     wq_dict = {}
+#
+#     wq_dict['values'] = wq.tolist()
+#     names = [i for i in range(wq.shape[0])]
+#     years = [j for j in range(wq.shape[1])]
+#     year = int(wq.shape[1]/2)
+#
+#     # wq_dict["values"] = values
+#     wq_dict["names"] = names
+#     wq_dict["years"] = years
+#     wq_dict["year"] = year
+#
+#     return wq_dict
 
-    wq_dict['values'] = wq.tolist()
-    names = [i for i in range(wq.shape[0])]
-    years = [j for j in range(wq.shape[1])]
-    year = int(wq.shape[1]/2)
 
-    # wq_dict["values"] = values
-    wq_dict["names"] = names
-    wq_dict["years"] = years
-    wq_dict["year"] = year
+def multi_softmax_format(result, words):
+    softmax_weights = result['softmax_weights']
+    softmax_weights_data = {}
+    dates = [j for j in range(len(softmax_weights))]
+    softmax_weights_data['words'] = dates
+    series = []
+    for i in range(softmax_weights.shape[0]):
+        row = []
+        for j in range(softmax_weights.shape[1]):
+            row.append(str(softmax_weights[i][j]))
+        tmp = {}
+        tmp['name'] = words[i]
+        tmp['values'] = row
+        series.append(tmp)
+    softmax_weights_data['series'] = series
+    softmax_weights_data['y'] = "Softmax Value"
 
-    return wq_dict
+    return softmax_weights_data
 
 
 def q(request):
+    path = './static/model'
+    sent = "I don't like the taste of this restaurant"
+    try:
+        files = os.listdir(path)
+        model_path = ""
+        for file in files:
+            if os.path.splitext(file)[1] == '.meta':
+                model_path = path + '/' + file
+    except:
+        context = {}
+        context['test'] = "Can't find model!"
+        return render(request, 'error.html', {'context': json.dumps(context)})
+
+    words = split_sent(sent)
+    length = len(words)
+
+    X = preprocess_words(words)
+
+    result = predict(X, model_path, path, length)
+    dict = qkv_format(result, words, mat='q')
+    dict_max = qkv_format(result, words, max_=5, mat='q')
+    dict_mean = qkv_format_mean(result, words, mean_=5, mat='q')
+
+    horiz
+
+    context = {}
+    context['dict'] = dict
+    context['dict_max'] = dict_max
+    context['dict_mean'] = dict_mean
+
+    return render(request, 'index.html', {'context': json.dumps(context),
+                                          'matrix_name': 'Q'})
+
+
+def k(request):
 
     path = './static/model'
     sent = "I don't like the taste of this restaurant"
@@ -262,25 +311,80 @@ def q(request):
     X = preprocess_words(words)
 
     result = predict(X, model_path, path, length)
-    print("input_embedding {}".format(result["input_embedding"].shape))
-    print("q {}".format(result["q"].shape))
-    input_embedding_dict = input_embedding_format(result, words)
-    q_dict, k_dict, v_dict = qkv_format(result, words)
-    wq_dict = wqwkwv_format(result)
+    dict = qkv_format(result, words, mat='k')
+    dict_max = qkv_format(result, words, max_=5, mat='k')
+    dict_mean = qkv_format_mean(result, words, mean_=5, mat='k')
 
-    nq = new_qkv_format(result, words)
 
     context = {}
-    context['q_dict'] = q_dict
-    context['k_dict'] = k_dict
-    context['v_dict'] = v_dict
-    context['wq_dict'] = wq_dict
-    context['input_embedding_dict'] = input_embedding_dict
-    context['nq'] = nq
-    print(q_dict)
+    context['dict'] = dict
+    context['dict_max'] = dict_max
+    context['dict_mean'] = dict_mean
+
+    return render(request, 'index.html', {'context': json.dumps(context),
+                                          'matrix_name': 'K'})
 
 
-    return render(request, 'index.html', {'context': json.dumps(context)})
+def v(request):
+    matrix_name = 'v'
+    path = './static/model'
+    sent = "I don't like the taste of this restaurant"
+    try:
+        files = os.listdir(path)
+        model_path = ""
+        for file in files:
+            if os.path.splitext(file)[1] == '.meta':
+                model_path = path + '/' + file
+    except:
+        context = {}
+        context['test'] = "Can't find model!"
+        return render(request, 'error.html', {'context': json.dumps(context)})
+
+    words = split_sent(sent)
+    length = len(words)
+
+    X = preprocess_words(words)
+
+    result = predict(X, model_path, path, length)
+    dict = qkv_format(result, words, mat=matrix_name)
+    dict_max = qkv_format(result, words, max_=5, mat=matrix_name)
+    dict_mean = qkv_format_mean(result, words, mean_=5, mat=matrix_name)
+
+
+    context = {}
+    context['dict'] = dict
+    context['dict_max'] = dict_max
+    context['dict_mean'] = dict_mean
+
+    return render(request, 'index.html', {'context': json.dumps(context),
+                                          'matrix_name': 'V'})
+
+
+def softmax(request):
+    path = './static/model'
+    sent = "I like the taste of this restaurant"
+    try:
+        files = os.listdir(path)
+        model_path = ""
+        for file in files:
+            if os.path.splitext(file)[1] == '.meta':
+                model_path = path + '/' + file
+    except:
+        context = {}
+        context['test'] = "Can't find model!"
+        return render(request, 'error.html', {'context': json.dumps(context)})
+
+    words = split_sent(sent)
+    length = len(words)
+
+    X = preprocess_words(words)
+    result = predict(X, model_path, path, length)
+    multi_softmax = multi_softmax_format(result, words)
+
+    context = {}
+    context['multi_softmax'] = multi_softmax
+
+    return render(request, 'words.html', {'context': json.dumps(context)})
 
 
 def search(request):
@@ -292,42 +396,42 @@ def search(request):
     return render(request, 'index.html', {'context': json.dumps(context)})
 
 
-def max_(request):
-    # sent = request.GET.get('q')
-    path = './static/model'
-    sent = "I don't like the taste of this restaurant"
-    try:
-        files = os.listdir(path)
-        model_path = ""
-        for file in files:
-            if os.path.splitext(file)[1] == '.meta':
-                model_path = path + '/' + file
-    except:
-        context = {}
-        context['test'] = "Can't find model!"
-        return render(request, 'error.html', {'context': json.dumps(context)})
-
-    words = split_sent(sent)
-    length = len(words)
-
-    X = preprocess_words(words)
-
-    result = predict(X, model_path, path, length)
-    print("input_embedding {}".format(result["input_embedding"].shape))
-    print("q {}".format(result["q"].shape))
-    input_embedding_dict = input_embedding_format(result, words)
-    q_dict, k_dict, v_dict = qkv_format(result, words, max_=5)
-    wq_dict = wqwkwv_format(result)
-
-    nq = new_qkv_format(result, words, max_=5)
-
-    context = {}
-    context['q_dict'] = q_dict
-    context['k_dict'] = k_dict
-    context['v_dict'] = v_dict
-    context['wq_dict'] = wq_dict
-    context['input_embedding_dict'] = input_embedding_dict
-    context['nq'] = nq
-    print(q_dict)
-
-    return render(request, 'index.html', {'context': json.dumps(context)})
+# def max_(request):
+#     # sent = request.GET.get('q')
+#     path = './static/model'
+#     sent = "I don't like the taste of this restaurant"
+#     try:
+#         files = os.listdir(path)
+#         model_path = ""
+#         for file in files:
+#             if os.path.splitext(file)[1] == '.meta':
+#                 model_path = path + '/' + file
+#     except:
+#         context = {}
+#         context['test'] = "Can't find model!"
+#         return render(request, 'error.html', {'context': json.dumps(context)})
+#
+#     words = split_sent(sent)
+#     length = len(words)
+#
+#     X = preprocess_words(words)
+#
+#     result = predict(X, model_path, path, length)
+#     print("input_embedding {}".format(result["input_embedding"].shape))
+#     print("q {}".format(result["q"].shape))
+#     input_embedding_dict = input_embedding_format(result, words)
+#     q_dict, k_dict, v_dict = qkv_format(result, words, max_=5)
+#     wq_dict = wqwkwv_format(result)
+#
+#     # nq = new_qkv_format(result, words, max_=5)
+#
+#     context = {}
+#     context['q_dict'] = q_dict
+#     context['k_dict'] = k_dict
+#     context['v_dict'] = v_dict
+#     context['wq_dict'] = wq_dict
+#     context['input_embedding_dict'] = input_embedding_dict
+#     # context['nq'] = nq
+#     print(q_dict)
+#
+#     return render(request, 'index.html', {'context': json.dumps(context)})

@@ -19,5 +19,9 @@ from . import view
 urlpatterns = [
     url(r'^$', view.q),
     url(r'^search/', view.search),
-    url(r'^max_/', view.max_),
+    # url(r'^max_/', view.max_),
+    url(r'^q/', view.q),
+    url(r'^k/', view.k),
+    url(r'^v/', view.v),
+    url(r'^horizon_softmax/', view.softmax)
 ]
