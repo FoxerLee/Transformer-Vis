@@ -26,17 +26,30 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
-      <div class="container">
-          <form class="form-inline" role="search" action="/search" method="get">
-            <div class="input-group" style="width: 80%">
-              <input class="form-control" type="text" name="q" placeholder="Search for...">
-              <span class="input-group-append">
-                <button class="btn btn-primary" type="submit">
-                  <i class="fa fa-search"></i>
-                </button>
-              </span>
-            </div>
-          </form>
+      <div class="row">
+
+          <div class="dropdown col-md-auto">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Dropdown button
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="/max_">Action</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+              </div>
+          </div>
+          <div class="col-md-auto">
+              <form class="form-inline" role="search" action="/search" method="get">
+                <div class="input-group" style="width: 80%">
+                  <input class="form-control" type="text" name="q" placeholder="Search for...">
+                  <span class="input-group-append">
+                    <button class="btn btn-primary" type="submit">
+                      <i class="fa fa-search"></i>
+                    </button>
+                  </span>
+                </div>
+              </form>
+          </div>
       </div>
     </div>
   </nav>
@@ -55,7 +68,23 @@
         <div class="card-header">
           <i class="fa fa-area-chart"></i> Area Chart Example</div>
         <div class="card-body">
-            <div id="q_dict"></div>
+            <div class="container">
+                <div id="input_embedding_dict"></div>
+                <div class="text-center">
+                    <img class="img-responsive center-block" src="../static/img/bojack.png" style="text-align: center">
+                </div>
+                <div class="row">
+                    <div class="col-xl-6">
+                        <div id="q_dict"></div>
+                        <div id="k_dict"></div>
+                    </div>
+                    <div class="col-xl-6">
+                        <div id="v_dict"></div>
+                    </div>
+                </div>
+
+
+            </div>
         </div>
         <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
       </div>
@@ -158,6 +187,16 @@
         </div>
         <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
       </div>
+
+        <!-- Example DataTables Card-->
+      <div class="card mb-3">
+        <div class="card-header">
+          <i class="fa fa-table"></i> Data Table Example</div>
+        <div class="card-body">
+          <div id="nq"></div>
+        </div>
+        <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+      </div>
     </div>
     <!-- /.container-fluid-->
     <!-- /.content-wrapper-->
@@ -189,21 +228,60 @@
     <script src="../static/js/sb-admin-charts.min.js"></script>
       <script src="https://d3js.org/d3.v4.min.js"></script>
       <script type="module">
+            // load data
+            var newData = {{ context | safe }};
 
             // Load the Observable runtime and inspector.
             import {Runtime, Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
 
-            // Your notebook, compiled as an ES module.
-            import notebook from "https://api.observablehq.com/@foxerlee/barcode-plot.js?v=3";
-            const main = new Runtime().module(notebook, name => {
+
+            // input_embedding
+            import notebookie from "https://api.observablehq.com/@foxerlee/barcode-plot.js?v=3";
+            const mainie = new Runtime().module(notebookie, name => {
+              if (name === "chart") {
+                return new Inspector(document.querySelector("#input_embedding_dict"));
+              }
+            });
+            mainie.redefine("data", newData['input_embedding_dict']);
+            {#var newExtentie = d3.extent(newData['input_embedding_dict'], d => d.color);#}
+            {#mainie.redefine("extent", newExtentie);#}
+
+            // q, k, v
+            // q
+            import notebookq from "https://api.observablehq.com/@foxerlee/barcode-plot.js?v=3";
+            const mainq = new Runtime().module(notebookq, name => {
               if (name === "chart") {
                 return new Inspector(document.querySelector("#q_dict"));
               }
             });
-            var newData = {{ context | safe }};
-            main.redefine("data", newData['q_dict']);
-            var newExtent = d3.extent(newData['q_dict'], d => d.color);
-            main.redefine("extent", newExtent);
+            mainq.redefine("data", newData['q_dict']);
+            {#var newExtentq = d3.extent(newData['q_dict'], d => d.color);#}
+            {#mainq.redefine("extent", newExtentq);#}
+
+
+            // k
+            import notebookk from "https://api.observablehq.com/@foxerlee/barcode-plot.js?v=3";
+            const maink = new Runtime().module(notebookk, name => {
+              if (name === "chart") {
+                return new Inspector(document.querySelector("#k_dict"));
+              }
+            });
+            maink.redefine("data", newData['k_dict']);
+            {#var newExtentk = d3.extent(newData['k_dict'], d => d.color);#}
+            {#maink.redefine("extent", newExtentk);#}
+
+
+            // v
+            import notebookv from "https://api.observablehq.com/@foxerlee/barcode-plot.js?v=3";
+            const mainv = new Runtime().module(notebookv, name => {
+              if (name === "chart") {
+                return new Inspector(document.querySelector("#v_dict"));
+              }
+            });
+            mainv.redefine("data", newData['v_dict']);
+            {#var newExtentv = d3.extent(newData['v_dict'], d => d.color);#}
+            {#mainv.redefine("extent", newExtentv);#}
+
 
             import notebook1 from "https://api.observablehq.com/@foxerlee/the-impact-of-vaccines.js?v=3";
             const main1 = new Runtime().module(notebook1, name => {
@@ -212,6 +290,14 @@
               }
             });
             main1.redefine("data", newData['wq_dict']);
+
+            import notebooknq from "https://api.observablehq.com/@foxerlee/horizon-chart.js?v=3";
+            const mainnq = new Runtime().module(notebooknq, name => {
+              if (name === "chart") {
+                return new Inspector(document.querySelector("#nq"));
+              }
+            });
+            mainnq.redefine("data", newData['nq']);
         </script>
   </div>
 </body>

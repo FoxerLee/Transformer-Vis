@@ -19,4 +19,5 @@ from . import view
 urlpatterns = [
     url(r'^$', view.q),
     url(r'^search/', view.search),
+    url(r'^max_/', view.max_),
 ]
