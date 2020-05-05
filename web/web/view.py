@@ -193,6 +193,7 @@ def qkv_format_mean(result, words, mean_=1, mat='q'):
             cand.append(matrix[i][j])
             if len(cand) == mean_:
                 tmp['value'] = str(val / matrix.shape[1])
+                tmp['spaces'] = str(val)
                 tmp['color'] = str(np.mean(np.array(cand)))
                 dict.append(tmp)
                 cand = []
@@ -352,12 +353,16 @@ def k(request):
     dict = qkv_format(result, words, mat='k')
     dict_max = qkv_format(result, words, max_=5, mat='k')
     dict_mean = qkv_format_mean(result, words, mean_=5, mat='k')
+    horizontal_pca = horizontal_pca_format(result, words, mat='k')
+    vertical_pca = vertical_pca_format(result, mat='k')
 
 
     context = {}
     context['dict'] = dict
     context['dict_max'] = dict_max
     context['dict_mean'] = dict_mean
+    context['horizontal_pca'] = horizontal_pca
+    context['vertical_pca'] = vertical_pca
 
     return render(request, 'index.html', {'context': json.dumps(context),
                                           'matrix_name': 'K'})
@@ -387,12 +392,16 @@ def v(request):
     dict = qkv_format(result, words, mat=matrix_name)
     dict_max = qkv_format(result, words, max_=5, mat=matrix_name)
     dict_mean = qkv_format_mean(result, words, mean_=5, mat=matrix_name)
+    horizontal_pca = horizontal_pca_format(result, words, mat='v')
+    vertical_pca = vertical_pca_format(result, mat='v')
 
 
     context = {}
     context['dict'] = dict
     context['dict_max'] = dict_max
     context['dict_mean'] = dict_mean
+    context['horizontal_pca'] = horizontal_pca
+    context['vertical_pca'] = vertical_pca
 
     return render(request, 'index.html', {'context': json.dumps(context),
                                           'matrix_name': 'V'})

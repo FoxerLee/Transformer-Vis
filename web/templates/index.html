@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
-  <title>SB Admin - Start Bootstrap Template</title>
+  <title>Transformer-Vis 💬</title>
   <!-- Bootstrap core CSS-->
   <link href="../static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <!-- Custom fonts for this template-->
@@ -29,24 +29,19 @@
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
-          <a class="nav-link" href="index.html">
-            <i class="fa fa-fw fa-dashboard"></i>
-            <span class="nav-link-text">Dashboard</span>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Matrix Vis">
+          <a class="nav-link" href="/q">
+            <i class="fa fa-fw fa-table"></i>
+            <span class="nav-link-text">Matrix Vis</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Words Vis">
           <a class="nav-link" href="/horizon_softmax">
             <i class="fa fa-fw fa-area-chart"></i>
-            <span class="nav-link-text">Charts</span>
+            <span class="nav-link-text">Words Vis</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Tables">
-          <a class="nav-link" href="tables.html">
-            <i class="fa fa-fw fa-table"></i>
-            <span class="nav-link-text">Tables</span>
-          </a>
-        </li>
+
       </ul>
       <ul class="navbar-nav sidenav-toggler">
         <li class="nav-item">
@@ -58,7 +53,8 @@
       <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle mr-lg-6" id="messagesDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fa fa-fw fa-envelope"></i>
+            <i class="fa fa-fw fa-eye"></i>
+
             <span class="indicator text-primary d-none d-lg-block">
               <i class="fa fa-fw fa-circle"></i>
             </span>
@@ -69,19 +65,19 @@
             <a class="dropdown-item" href="/q">
               <strong>Q Matrix</strong>
 
-              <div class="dropdown-message small">Hey there! This new version of SB Admin is pretty awesome! These messages clip off when they reach the end of the box so they don't overflow over to the sides!</div>
+              <div class="dropdown-message small">one word</div>
             </a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="/k">
               <strong>K Matrix</strong>
 
-              <div class="dropdown-message small">I was wondering if you could meet for an appointment at 3:00 instead of 4:00. Thanks!</div>
+              <div class="dropdown-message small">all words - index</div>
             </a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="/v">
               <strong>V Matrix</strong>
 
-              <div class="dropdown-message small">I've sent the final files over to you for review. When you're able to sign off of them let me know and we can discuss distribution.</div>
+              <div class="dropdown-message small">all words - value</div>
             </a>
           </div>
         </li>
@@ -150,21 +146,18 @@
           <!-- Example Bar Chart Card-->
           <div class="card mb-3">
             <div class="card-header">
-              <i class="fa fa-area-chart"></i> {{ matrix_name | safe }} Matrix - max</div>
+              <i class="fa fa-area-chart"></i> Horizontal PCA - words</div>
             <div class="card-body">
                 <div id="horizontal_pca_transforms"></div>
                 <div id="horizontal_pca"></div>
             </div>
             <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
           </div>
-          <!-- Card Columns Example Social Feed-->
-          <!-- /Card Columns-->
         </div>
         <div class="col-xl-6">
-          <!-- Example Pie Chart Card-->
           <div class="card mb-3">
             <div class="card-header">
-              <i class="fa fa-area-chart"></i> {{ matrix_name | safe }} Matrix - mean</div>
+              <i class="fa fa-area-chart"></i> Vertical PCA - dimension</div>
             <div class="card-body">
                 <div id="vertical_pca"></div>
             </div>
@@ -172,7 +165,6 @@
           </div>
         </div>
       </div>
-      <!-- Example DataTables Card-->
       <div class="card mb-3">
         <div class="card-header">
           <i class="fa fa-table"></i> Data Table Example</div>
