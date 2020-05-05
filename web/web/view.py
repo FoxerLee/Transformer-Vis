@@ -170,6 +170,7 @@ def qkv_format(result, words, max_=1, mat='q'):
             cand.append(matrix[i][j])
             if len(cand) == max_:
                 tmp['value'] = str(val / matrix.shape[1])
+                tmp['spaces'] = str(val)
                 tmp['color'] = str(np.max(np.array(cand)))
                 dict.append(tmp)
                 cand = []
@@ -199,6 +200,40 @@ def qkv_format_mean(result, words, mean_=1, mat='q'):
                 tmp['row'] = words[i]
                 val += 1
     return dict
+
+
+def horizontal_pca_format(result, words, mat='q'):
+    matrix = result[mat]
+    pca = decomposition.PCA(n_components=2)
+    pca.fit(matrix)
+    horizontal_pca = pca.transform(matrix)
+    # print(horizontal_pca)
+    horizontal_pca_dict = []
+    for h, w in zip(horizontal_pca, words):
+        tmp = {}
+        tmp['word'] = w
+        tmp['val'] = [str(h[0]), str(h[1]), '0']
+        horizontal_pca_dict.append(tmp)
+
+    return horizontal_pca_dict
+
+
+def vertical_pca_format(result, mat='q'):
+    matrix = result[mat]
+    matrix = matrix.reshape(matrix.shape[1], matrix.shape[0])
+    words = [j for j in range(matrix.shape[0])]
+
+    pca = decomposition.PCA(n_components=2)
+    pca.fit(matrix)
+    vertical_pca = pca.transform(matrix)
+    # print(horizontal_pca)
+    vertical_pca_dict = []
+    for h, w in zip(vertical_pca, words):
+        tmp = {}
+        tmp['word'] = w
+        tmp['val'] = [str(h[0]), str(h[1]), '0']
+        vertical_pca_dict.append(tmp)
+    return vertical_pca_dict
 
 
 # def input_embedding_format(result, words):
@@ -238,8 +273,8 @@ def qkv_format_mean(result, words, mean_=1, mat='q'):
 def multi_softmax_format(result, words):
     softmax_weights = result['softmax_weights']
     softmax_weights_data = {}
-    dates = [j for j in range(len(softmax_weights))]
-    softmax_weights_data['words'] = dates
+    # dates = [j for j in range(len(softmax_weights))]
+    softmax_weights_data['words'] = words
     series = []
     for i in range(softmax_weights.shape[0]):
         row = []
@@ -279,12 +314,15 @@ def q(request):
     dict_max = qkv_format(result, words, max_=5, mat='q')
     dict_mean = qkv_format_mean(result, words, mean_=5, mat='q')
 
-    horiz
+    horizontal_pca = horizontal_pca_format(result, words, mat='q')
+    vertical_pca = vertical_pca_format(result, mat='q')
 
     context = {}
     context['dict'] = dict
     context['dict_max'] = dict_max
     context['dict_mean'] = dict_mean
+    context['horizontal_pca'] = horizontal_pca
+    context['vertical_pca'] = vertical_pca
 
     return render(request, 'index.html', {'context': json.dumps(context),
                                           'matrix_name': 'Q'})
