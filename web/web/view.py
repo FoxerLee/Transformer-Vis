@@ -267,7 +267,6 @@ def word_cloud_format(result, words):
         series.append(tmp)
     word_cloud = {}
     word_cloud['series'] = series
-    print(series)
     return word_cloud
 
 def q(request):
