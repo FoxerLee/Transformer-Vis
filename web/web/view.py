@@ -72,7 +72,7 @@ def preprocess_words(words):
     word_idx_map = json.load(f)
     X = idx_sent(wordvecs, word_idx_map)
     pad_sequences(sequences=X, maxlen=39, padding="post")
-    print(X)
+    #print(X)
 
     return X
 
@@ -118,18 +118,23 @@ def predict(X, model_path, path, length):
     v = v.reshape(v.shape[1], v.shape[2])
     v = v[:length]
 
+    #get mean of word embedding
+    word_embedding = sess.run("Stack-Layer-1/Reshape_7:0", feed_dict)
+    word_embedding = word_embedding.reshape(word_embedding.shape[1], word_embedding.shape[2])
+    word_embedding = word_embedding[:length]
+
     # get wq, wk, wv
     # wq = sess.graph.get_tensor_by_name("Stack-Layer-1/dense/kernel:0").eval(session=sess)
     # result["wq"] = wq
     # result["input_embedding"] = input_embedding
 
     result["softmax_weights"] = weights
+    result["word_embedding"] = word_embedding
     result["q"] = q
     result["k"] = k
     result['v'] = v
 
     return result
-
 
 def qkv_format(result, words, max_=1, mat='q'):
     matrix = result[mat]
@@ -214,7 +219,6 @@ def vertical_pca_format(result, mat='q'):
 def multi_softmax_format(result, words):
     softmax_weights = result['softmax_weights']
     softmax_weights_data = {}
-    # dates = [j for j in range(len(softmax_weights))]
     softmax_weights_data['words'] = words
     series = []
     for i in range(softmax_weights.shape[0]):
@@ -227,9 +231,44 @@ def multi_softmax_format(result, words):
         series.append(tmp)
     softmax_weights_data['series'] = series
     softmax_weights_data['y'] = "Softmax Value"
-
+    softmax_weights_data['shunxu'] = [i for i in range(len(words))]
     return softmax_weights_data
 
+def softmax_matrix_format(result, words):
+    softmax_weights = result['softmax_weights']
+    softmax_matrix = {}
+    series = []
+    n = softmax_weights.shape[0]
+    for i in range(n):
+        for j in range(n):
+            tmp = {}
+            tmp['L1'] = words[i]
+            tmp['L2'] = words[j]
+            tmp['value'] = str(round(softmax_weights[i][j],4))
+            series.append(tmp)
+    softmax_matrix['table'] = series
+    return softmax_matrix
+
+def word_cloud_format(result, words):
+    word_embedding = result["word_embedding"]
+    num_col = word_embedding.shape[1]
+    num_row = word_embedding.shape[0]
+    word_freq = [0]*num_row
+    for i in range(num_col):
+        avg = np.sum(word_embedding[:, i])/num_row
+        sub = [abs(word_embedding[j][i]-avg) for j in range(num_row)]
+        minpos = sub.index(min(sub))
+        word_freq[minpos] = word_freq[minpos] + 1
+    series = []
+    for i in range(num_row):
+        tmp = {}
+        tmp['name'] = words[i]
+        tmp['value'] = word_freq[i]
+        series.append(tmp)
+    word_cloud = {}
+    word_cloud['series'] = series
+    print(series)
+    return word_cloud
 
 def q(request):
     path = './static/model'
@@ -373,9 +412,13 @@ def softmax(request):
     result = predict(X, model_path, path, length)
 
     multi_softmax = multi_softmax_format(result, words)
+    softmax_matrix = softmax_matrix_format(result, words)
+    word_cloud = word_cloud_format(result, words)
 
     context = {}
     context['multi_softmax'] = multi_softmax
+    context['softmax_matrix'] = softmax_matrix
+    context['word_cloud'] = word_cloud
 
     return render(request, 'words.html', {'context': json.dumps(context)})
 
@@ -417,7 +460,6 @@ def search_mat(request):
     horizontal_pca = horizontal_pca_format(result, words, mat='q')
     vertical_pca = vertical_pca_format(result, mat='q')
 
-    context = {}
     context['dict'] = dict
     context['dict_max'] = dict_max
     context['dict_mean'] = dict_mean
