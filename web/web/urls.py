@@ -18,7 +18,7 @@ from . import view
 
 urlpatterns = [
     url(r'^$', view.q),
-    url(r'^search/', view.search),
+    url(r'^search_mat/', view.search_mat),
     # url(r'^max_/', view.max_),
     url(r'^q/', view.q),
     url(r'^k/', view.k),

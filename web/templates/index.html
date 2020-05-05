@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
-  <title>SB Admin - Start Bootstrap Template</title>
+  <title>Transformer-Vis 💬</title>
   <!-- Bootstrap core CSS-->
   <link href="../static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <!-- Custom fonts for this template-->
@@ -16,6 +16,7 @@
   <link href="../static/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
   <!-- Custom styles for this template-->
   <link href="../static/css/sb-admin.css" rel="stylesheet">
+    <link href="../static/css/my_css.css" rel="stylesheet">
 </head>
 
 <body class="fixed-nav sticky-footer bg-dark sidenav-toggled" id="page-top">
@@ -28,24 +29,19 @@
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
-          <a class="nav-link" href="index.html">
-            <i class="fa fa-fw fa-dashboard"></i>
-            <span class="nav-link-text">Dashboard</span>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Matrix Vis">
+          <a class="nav-link" href="/q">
+            <i class="fa fa-fw fa-table"></i>
+            <span class="nav-link-text">Matrix Vis</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Words Vis">
           <a class="nav-link" href="/horizon_softmax">
             <i class="fa fa-fw fa-area-chart"></i>
-            <span class="nav-link-text">Charts</span>
+            <span class="nav-link-text">Words Vis</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Tables">
-          <a class="nav-link" href="tables.html">
-            <i class="fa fa-fw fa-table"></i>
-            <span class="nav-link-text">Tables</span>
-          </a>
-        </li>
+
       </ul>
       <ul class="navbar-nav sidenav-toggler">
         <li class="nav-item">
@@ -57,7 +53,8 @@
       <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle mr-lg-6" id="messagesDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fa fa-fw fa-envelope"></i>
+            <i class="fa fa-fw fa-eye"></i>
+
             <span class="indicator text-primary d-none d-lg-block">
               <i class="fa fa-fw fa-circle"></i>
             </span>
@@ -68,28 +65,28 @@
             <a class="dropdown-item" href="/q">
               <strong>Q Matrix</strong>
 
-              <div class="dropdown-message small">Hey there! This new version of SB Admin is pretty awesome! These messages clip off when they reach the end of the box so they don't overflow over to the sides!</div>
+              <div class="dropdown-message small">one word</div>
             </a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="/k">
               <strong>K Matrix</strong>
 
-              <div class="dropdown-message small">I was wondering if you could meet for an appointment at 3:00 instead of 4:00. Thanks!</div>
+              <div class="dropdown-message small">all words - index</div>
             </a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="/v">
               <strong>V Matrix</strong>
 
-              <div class="dropdown-message small">I've sent the final files over to you for review. When you're able to sign off of them let me know and we can discuss distribution.</div>
+              <div class="dropdown-message small">all words - value</div>
             </a>
           </div>
         </li>
         <li class="nav-item">
-          <form class="form-inline my-2 my-lg-0 mr-lg-2">
+          <form class="form-inline my-2 my-lg-0 mr-lg-2" action="/search_mat" method="get">
             <div class="input-group">
-              <input class="form-control" type="text" placeholder="Search for...">
+              <input class="form-control" type="text" name="input" placeholder="Input sentence...">
               <span class="input-group-append">
-                <button class="btn btn-primary" type="button">
+                <button class="btn btn-primary" type="submit">
                   <i class="fa fa-search"></i>
                 </button>
               </span>
@@ -144,7 +141,30 @@
           </div>
         </div>
       </div>
-      <!-- Example DataTables Card-->
+        <div class="row">
+        <div class="col-xl-6">
+          <!-- Example Bar Chart Card-->
+          <div class="card mb-3">
+            <div class="card-header">
+              <i class="fa fa-area-chart"></i> Horizontal PCA - words</div>
+            <div class="card-body">
+                <div id="horizontal_pca_transforms"></div>
+                <div id="horizontal_pca"></div>
+            </div>
+            <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+          </div>
+        </div>
+        <div class="col-xl-6">
+          <div class="card mb-3">
+            <div class="card-header">
+              <i class="fa fa-area-chart"></i> Vertical PCA - dimension</div>
+            <div class="card-body">
+                <div id="vertical_pca"></div>
+            </div>
+            <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+          </div>
+        </div>
+      </div>
       <div class="card mb-3">
         <div class="card-header">
           <i class="fa fa-table"></i> Data Table Example</div>
@@ -225,6 +245,24 @@
                }
             });
             mainmean.redefine("data", newData['dict_mean']);
+
+            import h_pca from "https://api.observablehq.com/@foxerlee/zoomable-scatterplot.js?v=3";
+            const mainh_pca = new Runtime().module(h_pca, name => {
+               switch (name) {
+                   case "chart": {
+                       return new Inspector(document.querySelector("#horizontal_pca"));
+                   }
+               }});
+            mainh_pca.redefine("data", newData['horizontal_pca']);
+
+            import v_pca from "https://api.observablehq.com/@foxerlee/zoomable-scatterplot.js?v=3";
+            const mainv_pca = new Runtime().module(v_pca, name => {
+               switch (name) {
+                   case "chart": {
+                       return new Inspector(document.querySelector("#vertical_pca"));
+                   }
+               }});
+            mainv_pca.redefine("data", newData['vertical_pca']);
 
         </script>
   </div>

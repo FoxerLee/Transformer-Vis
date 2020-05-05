@@ -46,7 +46,7 @@ def add_unknown_words(vecs, wordvecs, vocab, min_df=1, dim=50):
 
 
 def split_sent(sent):
-    for char in '!\"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~':
+    for char in '!\"#$%&()*+,-./:;<=>?@[\]^_`{|}~':
         sent = sent.replace('{}'.format(char), ' {} '.format(char))
     return sent.split()
 
@@ -103,9 +103,9 @@ def predict(X, model_path, path, length):
     # print(weights.shape)
 
     # get input_embedding
-    input_embedding = sess.run("Input_Embeddings_Dropout/dropout/mul_1:0", feed_dict)
-    input_embedding = input_embedding.reshape(input_embedding.shape[1], input_embedding.shape[2])
-    input_embedding = input_embedding[:length]
+    # input_embedding = sess.run("Input_Embeddings_Dropout/dropout/mul_1:0", feed_dict)
+    # input_embedding = input_embedding.reshape(input_embedding.shape[1], input_embedding.shape[2])
+    # input_embedding = input_embedding[:length]
 
     # get q, k, v
     q = sess.run("Stack-Layer-1/dense/Relu:0", feed_dict)
@@ -124,9 +124,9 @@ def predict(X, model_path, path, length):
     word_embedding = word_embedding[:length]
 
     # get wq, wk, wv
-    wq = sess.graph.get_tensor_by_name("Stack-Layer-1/dense/kernel:0").eval(session=sess)
-    result["wq"] = wq
-    result["input_embedding"] = input_embedding
+    # wq = sess.graph.get_tensor_by_name("Stack-Layer-1/dense/kernel:0").eval(session=sess)
+    # result["wq"] = wq
+    # result["input_embedding"] = input_embedding
 
     result["softmax_weights"] = weights
     result["word_embedding"] = word_embedding
@@ -135,36 +135,6 @@ def predict(X, model_path, path, length):
     result['v'] = v
 
     return result
-
-
-# def new_qkv_format(result, words, max_=1):
-#     q = result['q']
-#     q_data = {}
-#     dates = [j for j in range(30)]
-#     q_data['dates'] = dates
-#     series = []
-#     for i in range(q.shape[0]):
-#         row = []
-#         cand = []
-#         for j in range(q.shape[1]):
-#             cand.append(q[i][j])
-#             if len(cand) == max_:
-#                 row.append(str(np.max(np.array(cand))))
-#                 cand = []
-#         # print("row {}".format(row))
-#         # print("q[i] {}".format(q[i].tolist()))
-#         tmp = {}
-#         tmp['name'] = words[i]
-#         # tmp['values'] = q[i].tolist()
-#         tmp['values'] = row
-#         series.append(tmp)
-#     q_data['series'] = series
-#
-#     return q_data
-
-def word_embedding_format(word_embedding, words):
-
-    return 
 
 def qkv_format(result, words, max_=1, mat='q'):
     matrix = result[mat]
@@ -179,6 +149,7 @@ def qkv_format(result, words, max_=1, mat='q'):
             cand.append(matrix[i][j])
             if len(cand) == max_:
                 tmp['value'] = str(val / matrix.shape[1])
+                tmp['spaces'] = str(val)
                 tmp['color'] = str(np.max(np.array(cand)))
                 dict.append(tmp)
                 cand = []
@@ -201,6 +172,7 @@ def qkv_format_mean(result, words, mean_=1, mat='q'):
             cand.append(matrix[i][j])
             if len(cand) == mean_:
                 tmp['value'] = str(val / matrix.shape[1])
+                tmp['spaces'] = str(val)
                 tmp['color'] = str(np.mean(np.array(cand)))
                 dict.append(tmp)
                 cand = []
@@ -210,44 +182,43 @@ def qkv_format_mean(result, words, mean_=1, mat='q'):
     return dict
 
 
-# def input_embedding_format(result, words):
-#     input_embedding = result["input_embedding"]
-#     input_embedding_dict = []
-#     for i in range(input_embedding.shape[0]):
-#         # input_embedding[i] = min_max_range(input_embedding[i], (-0.5, 0.5))
-#         for j in range(input_embedding.shape[1]):
-#             tmp = {}
-#             tmp['row'] = words[i]
-#             tmp['value'] = str(j / input_embedding.shape[1])
-#             # tmp['color'] = str(-1 + (1 + 1)/(np.max(q)-np.min(q))*(q[i][j]-np.min(q)))
-#             tmp['color'] = str(input_embedding[i][j])
-#             # tmp['color'] = str(1.0/(1.0 + np.exp(-q[i][j])))
-#             input_embedding_dict.append(tmp)
-#
-#     return input_embedding_dict
+def horizontal_pca_format(result, words, mat='q'):
+    matrix = result[mat]
+    pca = decomposition.PCA(n_components=2)
+    pca.fit(matrix)
+    horizontal_pca = pca.transform(matrix)
+    # print(horizontal_pca)
+    horizontal_pca_dict = []
+    for h, w in zip(horizontal_pca, words):
+        tmp = {}
+        tmp['word'] = w
+        tmp['val'] = [str(h[0]), str(h[1]), '0']
+        horizontal_pca_dict.append(tmp)
+
+    return horizontal_pca_dict
 
 
-# def wqwkwv_format(result):
-#     wq = result["wq"]
-#     wq_dict = {}
-#
-#     wq_dict['values'] = wq.tolist()
-#     names = [i for i in range(wq.shape[0])]
-#     years = [j for j in range(wq.shape[1])]
-#     year = int(wq.shape[1]/2)
-#
-#     # wq_dict["values"] = values
-#     wq_dict["names"] = names
-#     wq_dict["years"] = years
-#     wq_dict["year"] = year
-#
-#     return wq_dict
+def vertical_pca_format(result, mat='q'):
+    matrix = result[mat]
+    matrix = matrix.reshape(matrix.shape[1], matrix.shape[0])
+    words = [j for j in range(matrix.shape[0])]
+
+    pca = decomposition.PCA(n_components=2)
+    pca.fit(matrix)
+    vertical_pca = pca.transform(matrix)
+    # print(horizontal_pca)
+    vertical_pca_dict = []
+    for h, w in zip(vertical_pca, words):
+        tmp = {}
+        tmp['word'] = w
+        tmp['val'] = [str(h[0]), str(h[1]), '0']
+        vertical_pca_dict.append(tmp)
+    return vertical_pca_dict
 
 
 def multi_softmax_format(result, words):
     softmax_weights = result['softmax_weights']
     softmax_weights_data = {}
-    dates = [j for j in range(len(softmax_weights))]
     softmax_weights_data['words'] = words
     series = []
     for i in range(softmax_weights.shape[0]):
@@ -301,7 +272,7 @@ def word_cloud_format(result, words):
 
 def q(request):
     path = './static/model'
-    sent = "I don't like the taste of this restaurant"
+    # sent = "I don't like the taste of this restaurant"
     try:
         files = os.listdir(path)
         model_path = ""
@@ -313,31 +284,36 @@ def q(request):
         context['test'] = "Can't find model!"
         return render(request, 'error.html', {'context': json.dumps(context)})
 
+    log = open('./static/log/sent.txt', 'r')
+    sent = log.readline()
+
+
     words = split_sent(sent)
     length = len(words)
-
     X = preprocess_words(words)
-
     result = predict(X, model_path, path, length)
+
     dict = qkv_format(result, words, mat='q')
     dict_max = qkv_format(result, words, max_=5, mat='q')
     dict_mean = qkv_format_mean(result, words, mean_=5, mat='q')
 
-    #horiz
+    horizontal_pca = horizontal_pca_format(result, words, mat='q')
+    vertical_pca = vertical_pca_format(result, mat='q')
 
     context = {}
     context['dict'] = dict
     context['dict_max'] = dict_max
     context['dict_mean'] = dict_mean
+    context['horizontal_pca'] = horizontal_pca
+    context['vertical_pca'] = vertical_pca
 
     return render(request, 'index.html', {'context': json.dumps(context),
                                           'matrix_name': 'Q'})
 
 
 def k(request):
-
     path = './static/model'
-    sent = "I don't like the taste of this restaurant"
+    # sent = "I don't like the taste of this restaurant"
     try:
         files = os.listdir(path)
         model_path = ""
@@ -349,21 +325,27 @@ def k(request):
         context['test'] = "Can't find model!"
         return render(request, 'error.html', {'context': json.dumps(context)})
 
+    log = open('./static/log/sent.txt', 'r')
+    sent = log.readline()
+
     words = split_sent(sent)
     length = len(words)
-
     X = preprocess_words(words)
-
     result = predict(X, model_path, path, length)
+
     dict = qkv_format(result, words, mat='k')
     dict_max = qkv_format(result, words, max_=5, mat='k')
     dict_mean = qkv_format_mean(result, words, mean_=5, mat='k')
+    horizontal_pca = horizontal_pca_format(result, words, mat='k')
+    vertical_pca = vertical_pca_format(result, mat='k')
 
 
     context = {}
     context['dict'] = dict
     context['dict_max'] = dict_max
     context['dict_mean'] = dict_mean
+    context['horizontal_pca'] = horizontal_pca
+    context['vertical_pca'] = vertical_pca
 
     return render(request, 'index.html', {'context': json.dumps(context),
                                           'matrix_name': 'K'})
@@ -372,7 +354,7 @@ def k(request):
 def v(request):
     matrix_name = 'v'
     path = './static/model'
-    sent = "I don't like the taste of this restaurant"
+    # sent = "I don't like the taste of this restaurant"
     try:
         files = os.listdir(path)
         model_path = ""
@@ -384,21 +366,27 @@ def v(request):
         context['test'] = "Can't find model!"
         return render(request, 'error.html', {'context': json.dumps(context)})
 
+    log = open('./static/log/sent.txt', 'r')
+    sent = log.readline()
+
     words = split_sent(sent)
     length = len(words)
-
     X = preprocess_words(words)
 
     result = predict(X, model_path, path, length)
     dict = qkv_format(result, words, mat=matrix_name)
     dict_max = qkv_format(result, words, max_=5, mat=matrix_name)
     dict_mean = qkv_format_mean(result, words, mean_=5, mat=matrix_name)
+    horizontal_pca = horizontal_pca_format(result, words, mat='v')
+    vertical_pca = vertical_pca_format(result, mat='v')
 
 
     context = {}
     context['dict'] = dict
     context['dict_max'] = dict_max
     context['dict_mean'] = dict_mean
+    context['horizontal_pca'] = horizontal_pca
+    context['vertical_pca'] = vertical_pca
 
     return render(request, 'index.html', {'context': json.dumps(context),
                                           'matrix_name': 'V'})
@@ -420,9 +408,9 @@ def softmax(request):
 
     words = split_sent(sent)
     length = len(words)
-
     X = preprocess_words(words)
     result = predict(X, model_path, path, length)
+
     multi_softmax = multi_softmax_format(result, words)
     softmax_matrix = softmax_matrix_format(result, words)
     word_cloud = word_cloud_format(result, words)
@@ -435,52 +423,49 @@ def softmax(request):
     return render(request, 'words.html', {'context': json.dumps(context)})
 
 
-def search(request):
-    sent = request.GET.get('q')
+def search_mat(request):
 
-    context = {}
-    context['test'] = 'hello'
+    path = './static/model'
+    # sent = "I don't like the taste of this restaurant"
+    try:
+        files = os.listdir(path)
+        model_path = ""
+        for file in files:
+            if os.path.splitext(file)[1] == '.meta':
+                model_path = path + '/' + file
+    except:
+        context = {}
+        context['test'] = "Can't find model!"
+        return render(request, 'error.html', {'context': json.dumps(context)})
 
-    return render(request, 'index.html', {'context': json.dumps(context)})
+    sent = request.GET.get('input')
 
+    log = open('./static/log/sent.txt', 'r')
+    old_sent = log.readline()
+    if old_sent != sent:
+        log.close()
+        new_log = open('./static/log/sent.txt', 'w')
+        new_log.write(sent)
+        new_log.close()
 
+    words = split_sent(sent)
+    length = len(words)
+    X = preprocess_words(words)
+    result = predict(X, model_path, path, length)
 
-# def max_(request):
-#     # sent = request.GET.get('q')
-#     path = './static/model'
-#     sent = "I don't like the taste of this restaurant"
-#     try:
-#         files = os.listdir(path)
-#         model_path = ""
-#         for file in files:
-#             if os.path.splitext(file)[1] == '.meta':
-#                 model_path = path + '/' + file
-#     except:
-#         context = {}
-#         context['test'] = "Can't find model!"
-#         return render(request, 'error.html', {'context': json.dumps(context)})
-#
-#     words = split_sent(sent)
-#     length = len(words)
-#
-#     X = preprocess_words(words)
-#
-#     result = predict(X, model_path, path, length)
-#     print("input_embedding {}".format(result["input_embedding"].shape))
-#     print("q {}".format(result["q"].shape))
-#     input_embedding_dict = input_embedding_format(result, words)
-#     q_dict, k_dict, v_dict = qkv_format(result, words, max_=5)
-#     wq_dict = wqwkwv_format(result)
-#
-#     # nq = new_qkv_format(result, words, max_=5)
-#
-#     context = {}
-#     context['q_dict'] = q_dict
-#     context['k_dict'] = k_dict
-#     context['v_dict'] = v_dict
-#     context['wq_dict'] = wq_dict
-#     context['input_embedding_dict'] = input_embedding_dict
-#     # context['nq'] = nq
-#     print(q_dict)
-#
-#     return render(request, 'index.html', {'context': json.dumps(context)})
+    dict = qkv_format(result, words, mat='q')
+    dict_max = qkv_format(result, words, max_=5, mat='q')
+    dict_mean = qkv_format_mean(result, words, mean_=5, mat='q')
+
+    horizontal_pca = horizontal_pca_format(result, words, mat='q')
+    vertical_pca = vertical_pca_format(result, mat='q')
+
+    context['dict'] = dict
+    context['dict_max'] = dict_max
+    context['dict_mean'] = dict_mean
+    context['horizontal_pca'] = horizontal_pca
+    context['vertical_pca'] = vertical_pca
+
+    return render(request, 'index.html', {'context': json.dumps(context),
+                                          'matrix_name': 'Q'})
+
