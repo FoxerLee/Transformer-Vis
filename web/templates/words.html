@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
-  <title>SB Admin - Start Bootstrap Template</title>
+  <title>Transformer-Vis 💬</title>
   <!-- Bootstrap core CSS-->
   <link href="../static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <!-- Custom fonts for this template-->
@@ -71,71 +71,49 @@
     <div class="container-fluid">
       <!-- Breadcrumbs-->
       <ol class="breadcrumb">
-        <li class="breadcrumb-item active">Matrix Showing Collections</li>
+        <li class="breadcrumb-item active">Words Showing Collections</li>
       </ol>
-      <!-- Area Chart Example-->
-      <div class="card mb-3">
-        <div class="card-header">
-          <i class="fa fa-bar-chart"></i> Softmax Chart</div>
-        <div class="card-body">
-            <div class="container">
-                <div id="multi_softmax"></div>
+        <div class="card mb-3">
+            <div class="card-header">
+              <i class="fa fa-area-chart"></i> Words Contribution</div>
+            <div class="card-body">
+                <div id="wq"></div>
             </div>
-        </div>
-        <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
-      </div>
+            <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+          </div>
       <div class="row">
+          <div class="col-xl-6">
+              <div class="card mb-3">
+                <div class="card-header">
+                  <i class="fa fa-bar-chart"></i> Softmax - Multiline Chart </div>
+                <div class="card-body">
+                    <div class="container">
+                        <div id="multi_softmax"></div>
+                    </div>
+                </div>
+                <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+              </div>
+          </div>
+
         <div class="col-xl-6">
-          <!-- Example Bar Chart Card-->
           <div class="card mb-3">
             <div class="card-header">
-              <i class="fa fa-area-chart"></i> {{ matrix_name | safe }} Matrix - max</div>
+              <i class="fa fa-area-chart"></i> Softmax - Matrix Chart</div>
             <div class="card-body">
-                <div id="dict_max"></div>
+                <div id="nq"></div>
             </div>
             <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
           </div>
-          <!-- Card Columns Example Social Feed-->
-          <!-- /Card Columns-->
         </div>
-        <div class="col-xl-6">
-          <!-- Example Pie Chart Card-->
-          <div class="card mb-3">
-            <div class="card-header">
-              <i class="fa fa-area-chart"></i> {{ matrix_name | safe }} Matrix - mean</div>
-            <div class="card-body">
-                <div id="dict_mean"></div>
-            </div>
-            <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
-          </div>
-        </div>
-      </div>
-      <!-- Example DataTables Card-->
-      <div class="card mb-3">
-        <div class="card-header">
-          <i class="fa fa-table"></i> Data Table Example</div>
-        <div class="card-body">
-          <div id="wq"></div>
-        </div>
-        <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
       </div>
 
-        <!-- Example DataTables Card-->
-      <div class="card mb-3">
-        <div class="card-header">
-          <i class="fa fa-table"></i> Data Table Example</div>
-        <div class="card-body">
-          <div id="nq"></div>
-        </div>
-        <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
-      </div>
     </div>
     <!-- /.container-fluid-->
     <!-- /.content-wrapper-->
     <footer class="sticky-footer">
       <div class="container">
         <div class="text-center">
-          <small>Copyright © Your Website 2018</small>
+          <small>Copyright © VisML 2020</small>
         </div>
       </div>
     </footer>
