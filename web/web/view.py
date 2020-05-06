@@ -184,6 +184,7 @@ def qkv_format_mean(result, words, mean_=1, mat='q'):
 
 def horizontal_pca_format(result, words, mat='q'):
     matrix = result[mat]
+
     pca = decomposition.PCA(n_components=2)
     pca.fit(matrix)
     horizontal_pca = pca.transform(matrix)
@@ -234,6 +235,7 @@ def multi_softmax_format(result, words):
     softmax_weights_data['shunxu'] = [i for i in range(len(words))]
     return softmax_weights_data
 
+
 def softmax_matrix_format(result, words):
     softmax_weights = result['softmax_weights']
     softmax_matrix = {}
@@ -248,6 +250,7 @@ def softmax_matrix_format(result, words):
             series.append(tmp)
     softmax_matrix['table'] = series
     return softmax_matrix
+
 
 def word_cloud_format(result, words):
     word_embedding = result["word_embedding"]

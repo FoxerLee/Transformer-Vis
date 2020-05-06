@@ -73,14 +73,28 @@
       <ol class="breadcrumb">
         <li class="breadcrumb-item active">Words Showing Collections</li>
       </ol>
-        <div class="card mb-3">
-            <div class="card-header">
-              <i class="fa fa-area-chart"></i> Words Contribution</div>
-            <div class="card-body">
-                <div id="wq"></div>
+        <div class="row">
+            <div class="col-xl-6 col-xl-offset-3">
+                <div class="card mb-3">
+                    <div class="card-header">
+                      <i class="fa fa-area-chart"></i> Words Contribution</div>
+                    <div class="card-body">
+                        <div id="wq"></div>
+                    </div>
+                    <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+                  </div>
             </div>
-            <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
-          </div>
+            <div class="col-xl-6">
+              <div class="card mb-3">
+                <div class="card-header">
+                  <i class="fa fa-area-chart"></i> Softmax - Matrix Chart</div>
+                <div class="card-body">
+                    <div id="nq"></div>
+                </div>
+                <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+              </div>
+            </div>
+        </div>
       <div class="row">
           <div class="col-xl-6">
               <div class="card mb-3">
@@ -95,16 +109,7 @@
               </div>
           </div>
 
-        <div class="col-xl-6">
-          <div class="card mb-3">
-            <div class="card-header">
-              <i class="fa fa-area-chart"></i> Softmax - Matrix Chart</div>
-            <div class="card-body">
-                <div id="nq"></div>
-            </div>
-            <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
-          </div>
-        </div>
+
       </div>
 
     </div>
@@ -162,7 +167,7 @@
             console.log(newData['softmax_matrix'])
             matrix_main.redefine("data", newData['softmax_matrix']);
 
-            import cloud from "https://api.observablehq.com/@wmx567/word-cloud-why-we-sleep-by-matthew-walker/2.js?v=3";
+            import cloud from "https://api.observablehq.com/@foxerlee/word-cloud-why-we-sleep-by-matthew-walker/2.js?v=3";
             const cloud_main = new Runtime().module(cloud, name => {
                if (name === "chart") {
                    return new Inspector(document.querySelector("#wq"));

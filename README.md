@@ -2,7 +2,7 @@
 
 A transformer visualization system.(Developing)
 
-## Install
+## Usage
 
 Before you run the jupyter notebook, you need to install some requirements defined in **requirements.txt**.
 
