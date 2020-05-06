@@ -393,7 +393,7 @@ def v(request):
 
 def softmax(request):
     path = './static/model'
-    sent = "I like the taste of this restaurant"
+    # sent = "I like the taste of this restaurant"
     try:
         files = os.listdir(path)
         model_path = ""
@@ -404,6 +404,9 @@ def softmax(request):
         context = {}
         context['test'] = "Can't find model!"
         return render(request, 'error.html', {'context': json.dumps(context)})
+
+    log = open('./static/log/sent.txt', 'r')
+    sent = log.readline()
 
     words = split_sent(sent)
     length = len(words)
@@ -459,6 +462,8 @@ def search_mat(request):
     horizontal_pca = horizontal_pca_format(result, words, mat='q')
     vertical_pca = vertical_pca_format(result, mat='q')
 
+    context = {}
+
     context['dict'] = dict
     context['dict_max'] = dict_max
     context['dict_mean'] = dict_mean
@@ -468,3 +473,43 @@ def search_mat(request):
     return render(request, 'index.html', {'context': json.dumps(context),
                                           'matrix_name': 'Q'})
 
+
+def search_soft(request):
+    path = './static/model'
+    # sent = "I like the taste of this restaurant"
+    try:
+        files = os.listdir(path)
+        model_path = ""
+        for file in files:
+            if os.path.splitext(file)[1] == '.meta':
+                model_path = path + '/' + file
+    except:
+        context = {}
+        context['test'] = "Can't find model!"
+        return render(request, 'error.html', {'context': json.dumps(context)})
+
+    sent = request.GET.get('input')
+
+    log = open('./static/log/sent.txt', 'r')
+    old_sent = log.readline()
+    if old_sent != sent:
+        log.close()
+        new_log = open('./static/log/sent.txt', 'w')
+        new_log.write(sent)
+        new_log.close()
+
+    words = split_sent(sent)
+    length = len(words)
+    X = preprocess_words(words)
+    result = predict(X, model_path, path, length)
+
+    multi_softmax = multi_softmax_format(result, words)
+    softmax_matrix = softmax_matrix_format(result, words)
+    word_cloud = word_cloud_format(result, words)
+
+    context = {}
+    context['multi_softmax'] = multi_softmax
+    context['softmax_matrix'] = softmax_matrix
+    context['word_cloud'] = word_cloud
+
+    return render(request, 'words.html', {'context': json.dumps(context)})

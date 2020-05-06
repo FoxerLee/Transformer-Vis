@@ -23,5 +23,6 @@ urlpatterns = [
     url(r'^q/', view.q),
     url(r'^k/', view.k),
     url(r'^v/', view.v),
-    url(r'^horizon_softmax/', view.softmax)
+    url(r'^horizon_softmax/', view.softmax),
+    url(r'^search_soft/', view.search_soft)
 ]
