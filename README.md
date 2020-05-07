@@ -25,7 +25,7 @@ cd train
 python san.py -emb embeddings/google.txt
 ```
 
-The model will be stored in `./model` folder. 
+The model will be stored in `./train/model` folder. 
 
 The code are modefied based on [SSAN-self-attention-sentiment-analysis-classification](https://github.com/Artaches/SSAN-self-attention-sentiment-analysis-classification). To change which self-attention architecture, you can go through this repository.
 
