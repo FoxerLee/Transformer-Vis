@@ -43,6 +43,10 @@ Now you can use Transformers-Vis at `http://127.0.0.1:8000/`.
 
 ## Some Charts from Transofrmers-Vis
 
+We use D3 to complish the visualization.
+
+All visualization codes can be found at https://observablehq.com/@wmx567?tab=notebooks
+
 ### Max matrix
 
 Max matrix is used to detect outlier points. It will help users to find the most contributed words or dimensions in model.
