@@ -149,7 +149,7 @@
             // Load the Observable runtime and inspector.
             import {Runtime, Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
 
-            import sm from "https://api.observablehq.com/@foxerlee/multi-line-chart/2.js?v=3";
+            import sm from "https://api.observablehq.com/@wmx567/multi-line-chart/2.js?v=3";
             const maind = new Runtime().module(sm, name => {
               if (name === "chart") {
                 return new Inspector(document.querySelector("#multi_softmax"));
@@ -167,7 +167,7 @@
             console.log(newData['softmax_matrix'])
             matrix_main.redefine("data", newData['softmax_matrix']);
 
-            import cloud from "https://api.observablehq.com/@foxerlee/word-cloud-why-we-sleep-by-matthew-walker/2.js?v=3";
+            import cloud from "https://api.observablehq.com/@wmx567/word-cloud-why-we-sleep-by-matthew-walker/2.js?v=3";
             const cloud_main = new Runtime().module(cloud, name => {
                if (name === "chart") {
                    return new Inspector(document.querySelector("#wq"));

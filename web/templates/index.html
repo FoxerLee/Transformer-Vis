@@ -1,3 +1,4 @@
+  
 <!DOCTYPE html>
 <html lang="en">
 
@@ -199,7 +200,7 @@
 
 
 
-            import dict from "https://api.observablehq.com/@foxerlee/barcode-plot.js?v=3";
+            import dict from "https://api.observablehq.com/@wmx567/barcode-plot.js?v=3";
             const maind = new Runtime().module(dict, name => {
               if (name === "chart") {
                 return new Inspector(document.querySelector("#dict"));
@@ -207,7 +208,7 @@
             });
             maind.redefine("data", newData['dict']);
 
-            import dict_max from "https://api.observablehq.com/@foxerlee/barcode-plot.js?v=3";
+            import dict_max from "https://api.observablehq.com/@wmx567/barcode-plot.js?v=3";
             const mainmax = new Runtime().module(dict_max, name => {
                if (name === "chart") {
                    return new Inspector(document.querySelector("#dict_max"));
@@ -215,7 +216,7 @@
             });
             mainmax.redefine("data", newData['dict_max']);
 
-            import dict_mean from "https://api.observablehq.com/@foxerlee/barcode-plot.js?v=3";
+            import dict_mean from "https://api.observablehq.com/@wmx567/barcode-plot.js?v=3";
             const mainmean = new Runtime().module(dict_mean, name => {
                if (name === "chart") {
                    return new Inspector(document.querySelector("#dict_mean"));
@@ -223,7 +224,7 @@
             });
             mainmean.redefine("data", newData['dict_mean']);
 
-            import h_pca from "https://api.observablehq.com/@foxerlee/zoomable-scatterplot.js?v=3";
+            import h_pca from "https://api.observablehq.com/@wmx567/zoomable-scatterplot.js?v=3";
             const mainh_pca = new Runtime().module(h_pca, name => {
                switch (name) {
                    case "chart": {
@@ -232,7 +233,7 @@
                }});
             mainh_pca.redefine("data", newData['horizontal_pca']);
 
-            import v_pca from "https://api.observablehq.com/@foxerlee/zoomable-scatterplot.js?v=3";
+            import v_pca from "https://api.observablehq.com/@wmx567/zoomable-scatterplot.js?v=3";
             const mainv_pca = new Runtime().module(v_pca, name => {
                switch (name) {
                    case "chart": {
